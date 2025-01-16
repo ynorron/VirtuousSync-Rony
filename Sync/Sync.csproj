@@ -48,11 +48,17 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.5.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.9.0.1\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.HashCode.1.0.0\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=9.0.0.1, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.9.0.1\lib\net462\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=9.0.0.1, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.9.0.1\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=110.2.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
       <HintPath>packages\RestSharp.110.2.0\lib\net471\RestSharp.dll</HintPath>
@@ -94,33 +100,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbbreviatedContact.cs" />
-    <Compile Include="Conditions\Condition.cs" />
-    <Compile Include="Conditions\IsStateCondition.cs" />
-    <Compile Include="Configuration.cs" />
-    <Compile Include="ContactQueryRequest.cs" />
-    <Compile Include="DTO\AbbreviatedContactDTO.cs" />
-    <Compile Include="Group.cs" />
-    <Compile Include="Migrations\202501161721259_InitialMigration.cs" />
-    <Compile Include="Migrations\202501161721259_InitialMigration.Designer.cs">
+    <Compile Include="Core\Entities\AbbreviatedContact.cs" />
+    <Compile Include="Application\Features\Contact\Conditions\Condition.cs" />
+    <Compile Include="Application\Features\Contact\Conditions\IsStateCondition.cs" />
+    <Compile Include="Infrastructure\Configuration.cs" />
+    <Compile Include="Application\DTO\ContactQueryRequest.cs" />
+    <Compile Include="Application\DTO\AbbreviatedContactDTO.cs" />
+    <Compile Include="Core\ValueObjects\Group.cs" />
+    <Compile Include="Infrastructure\Migrations\202501161721259_InitialMigration.cs" />
+    <Compile Include="Infrastructure\Migrations\202501161721259_InitialMigration.Designer.cs">
       <DependentUpon>202501161721259_InitialMigration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="PagedResult.cs" />
+    <Compile Include="Infrastructure\Migrations\Configuration.cs" />
+    <Compile Include="Core\Common\PagedResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryBuilders\GroupBuilder.cs" />
-    <Compile Include="VirtuousDbContext.cs" />
-    <Compile Include="VirtuousService.cs" />
+    <Compile Include="Application\Features\Contact\QueryBuilders\GroupBuilder.cs" />
+    <Compile Include="Infrastructure\VirtuousDbContext.cs" />
+    <Compile Include="Application\Services\VirtuousService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202501161721259_InitialMigration.resx">
+    <EmbeddedResource Include="Infrastructure\Migrations\202501161721259_InitialMigration.resx">
       <DependentUpon>202501161721259_InitialMigration.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Application\Interfaces\" />
+    <Folder Include="Core\Exceptions\" />
+    <Folder Include="Core\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
