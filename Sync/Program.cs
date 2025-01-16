@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sync
@@ -29,6 +30,7 @@ namespace Sync
                 while (skip < maxContacts)
                 {
                     var contacts = await virtuousService.GetContactsAsync(skip, take);
+                    if (contacts.List == null || !contacts.List.Any()) break;
                     csv.WriteRecords(contacts.List);
                     skip += take;
                 }
