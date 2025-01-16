@@ -1,8 +1,5 @@
-﻿using AutoMapper;
-using RestSharp;
-using Sync.DTO;
+﻿using RestSharp;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 namespace Sync
@@ -14,7 +11,7 @@ namespace Sync
     {
         private readonly RestClient _restClient;
 
-        public VirtuousService(IConfiguration configuration)
+        public VirtuousService(IConfiguration configuration) 
         {
             var apiBaseUrl = configuration.GetValue("VirtuousApiBaseUrl");
             var apiKey = configuration.GetValue("VirtuousApiKey");
@@ -27,7 +24,7 @@ namespace Sync
             _restClient = new RestClient(options);
         }
 
-        public async Task<PagedResult<AbbreviatedContactDTO>> GetContactsAsync(int skip, int take)
+        public async Task<PagedResult<AbbreviatedContact>> GetContactsAsync(int skip, int take)
         {
             var request = new RestRequest("/api/Contact/Query", Method.Post);
             request.AddQueryParameter("Skip", skip);
@@ -36,12 +33,12 @@ namespace Sync
             var body = new ContactQueryRequest();
             request.AddJsonBody(body);
 
-            var response = await _restClient.PostAsync<PagedResult<AbbreviatedContactDTO>>(request);
+            var response = await _restClient.PostAsync<PagedResult<AbbreviatedContact>>(request);
             return response;
         }
-        public async Task<PagedResult<AbbreviatedContactDTO>> GetContactsAsync(int skip, int take, List<Group> queryGroups)
+        public async Task<PagedResult<AbbreviatedContact>> GetContactsAsync(int skip, int take, List<Group> queryGroups)
         {
-            if (queryGroups == null || queryGroups.Count == 0) throw new System.ArgumentNullException(); // TODO: create custom or more explicit exceptions.
+            if (queryGroups == null || queryGroups.Count == 0) throw new System.Exception(); // TODO: create custom or more explicit exceptions.
 
             var request = new RestRequest("/api/Contact/Query", Method.Post);
             request.AddQueryParameter("Skip", skip);
@@ -51,7 +48,7 @@ namespace Sync
             body.Groups.AddRange(queryGroups);
             request.AddJsonBody(body);
 
-            var response = await _restClient.PostAsync<PagedResult<AbbreviatedContactDTO>>(request);
+            var response = await _restClient.PostAsync<PagedResult<AbbreviatedContact>>(request);
             return response;
         }
     }
