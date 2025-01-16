@@ -1,8 +1,11 @@
 ﻿using CsvHelper;
+using Sync.QueryBuilders;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sync
@@ -27,9 +30,14 @@ namespace Sync
             using (var writer = new StreamWriter($"Contacts_{DateTime.Now:MM_dd_yyyy}.csv"))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
+                var queryGroups = new GroupBuilder()
+                    .AddGroup(new IsStateCondition("AZ")) // add other conditions like contains "Contact Name" new ContainsContactNameCondition("Rony"))
+                   //.AddGroup(new IsStateCondition("FL")) // customize with different query groups
+                    .Build();
+
                 while (skip < maxContacts)
                 {
-                    var contacts = await virtuousService.GetContactsAsync(skip, take);
+                    var contacts = await virtuousService.GetContactsAsync(skip, take, queryGroups);
                     if (contacts.List == null || !contacts.List.Any()) break;
                     csv.WriteRecords(contacts.List);
                     skip += take;
