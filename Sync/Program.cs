@@ -1,11 +1,8 @@
-﻿using CsvHelper;
+﻿using AutoMapper;
+using Sync.DTO;
 using Sync.QueryBuilders;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sync
@@ -27,19 +24,46 @@ namespace Sync
             var take = 100;
             var maxContacts = 1000;
 
-            using (var writer = new StreamWriter($"Contacts_{DateTime.Now:MM_dd_yyyy}.csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            using (var context = new VirtuousDbContext())
             {
                 var queryGroups = new GroupBuilder()
                     .AddGroup(new IsStateCondition("AZ")) // add other conditions like contains "Contact Name" new ContainsContactNameCondition("Rony"))
-                   //.AddGroup(new IsStateCondition("FL")) // customize with different query groups
+                    .AddGroup(new IsStateCondition("FL")) // customize with different query groups
                     .Build();
+
+                // configure automapper
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<AbbreviatedContactDTO, AbbreviatedContact>()
+                       .ForMember(dest => dest.ExternalId, opt => opt.MapFrom(src => src.Id));
+                });
+
+                var mapper = config.CreateMapper(); // TODO: have these depedencies injected
 
                 while (skip < maxContacts)
                 {
                     var contacts = await virtuousService.GetContactsAsync(skip, take, queryGroups);
+
                     if (contacts.List == null || !contacts.List.Any()) break;
-                    csv.WriteRecords(contacts.List);
+
+                    // we want to check if the contacts already exists to avoid adding duplicates
+                    var payloadIds = contacts.List.Select(c => c.Id).ToList(); 
+
+                    var existingIds = context.Contacts
+                                              .Where(c => payloadIds.Contains(c.ExternalId))
+                                              .Select(c => c.ExternalId)
+                                              .ToHashSet(); //hashset enhances lookup efficiency with Contains()
+
+                    var newContacts = contacts.List.Where(dto => !existingIds.Contains(dto.Id)).ToList();
+
+                    var contactsMapped = mapper.Map<List<AbbreviatedContact>>(newContacts);
+
+                    // add only the new contacts
+                    if (contactsMapped.Any())
+                    {
+                        context.Contacts.AddRange(contactsMapped);
+                        await context.SaveChangesAsync();
+                    }
                     skip += take;
                 }
             }
